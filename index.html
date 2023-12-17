@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gravity Bouncing Balls</title>
+    <style>
+        #myCanvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas')
+        const ctx = canvas.getContext('2d')
+
+        let balls =[]
+        class Ball {
+            constructor(x,y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 20;
+                this.speedPx = 0;
+                this.gravity = 0.6;
+                this.damping = 0.7;
+                this.bounceThreshold = 1.0;
+            }
+             draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            update() {
+                this.speedPx += this.gravity;
+                this.y += this.speedPx;
+
+                // Bounce when hitting the bottom
+                if (this.y + this.radius > canvas.height) {
+                    this.y = canvas.height - this.radius;
+                    this.speedPx *= -this.damping;
+
+                    // Stop the circle if the bounce velocity is very low
+                    if (Math.abs(this.speedPx) < this.bounceThreshold) {
+                        this.speedPx = 0;
+                    }
+                }
+
+                this.draw();
+            }
+
+        }
+
+        canvas.addEventListener("click", function (event){
+            const coords  = canvas.getBoundingClientRect()
+            const x = event.clientX - coords.left;
+            const y = event.clientY - coords.top;
+            balls.push(new Ball(x, y));
+        })
+
+          function animate()  {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let ball of balls) {
+                ball.update();
+            }
+            requestAnimationFrame(animate);
+        }
+        animate()
+    </script>
+</body>
+</html>
